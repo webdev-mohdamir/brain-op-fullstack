@@ -1,17 +1,16 @@
 import User from "../models/user.model.js";
-import validateJwt from "../lib/valdateJwtToekn.js";
 import _ from "lodash";
 import { dbSecretFields } from "../config/constant.js";
 
 export const profileController = async (req, res) => {
   try {
-    const result = validateJwt(req.token);
+    const { user_id } = req.sessionUser;
 
-    if (!result || !result.valid) {
-      return res.status(401).json({ error: result.error });
+    if (!user_id) {
+      return res.status(401).json({ error: "User not found" });
     }
 
-    const user = await User.findById(result.decoded.id);
+    const user = await User.findById(user_id);
 
     if (!user) {
       return res.status(404).json({ message: "User not found" });
